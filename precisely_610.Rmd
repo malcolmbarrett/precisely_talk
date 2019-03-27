@@ -1,0 +1,400 @@
+---
+title: "Introducing precisely"
+subtitle: "an R package for estimating sample size based on precision rather than power"
+author: "Malcolm Barrett"
+date: "<a href='https://twitter.com/malco_barrett'>@malco_barrett</a> <p><h4>Slides: <a href='https://malco.io/slides/precisely'>malco.io/slides/precisely</a></h4></p>"
+output:
+  xaringan::moon_reader:
+    css: ["default", "theme.css"]
+    lib_dir: libs
+    nature:
+      highlightStyle: github
+      highlightLines: true
+      countIncrementalSlides: false
+---
+
+```{r setup, include=FALSE}
+options(htmltools.dir.version = FALSE, tibble.max_extra_cols = 6, tibble.width = 50)
+knitr::opts_chunk$set(warning = FALSE, message = FALSE, fig.align = "center", dpi = 320, fig.height = 4.75)
+
+library(mbmisc)
+library(tidyverse)
+```
+
+background-image: url(tellusaboutr.jpg)
+background-size: cover
+
+---
+
+class: inverse, takeaways
+
+## **precisely lets you estimate sample size based on precision instead of significance**
+
+---
+
+class: inverse, takeaways
+
+## ~~precisely lets you estimate sample size based on precision instead of significance~~
+## **calculate n for common measures, like risk difference and risk ratio**
+
+---
+
+class: inverse, takeaways
+
+## ~~precisely lets you estimate sample size based on precision instead of significance~~
+## ~~calculate n for common measures, like risk difference and risk ratio~~
+## **Work in R or on the web**
+
+---
+
+background-image: url(clippings.png)
+background-size: 95%
+
+---
+
+background-image: url(precpaper.png)
+background-size: cover
+
+---
+
+# What is precision?
+
+---
+
+# ~~What is precision?~~
+
+## *Differences: width of the CI*
+
+---
+
+# ~~What is precision?~~
+
+## ~~Differences: width of the CI~~
+## *Ratios: upper bound/lower bound*
+
+---
+
+## You need:
+
+## *desired precision*
+
+---
+
+## You need:
+
+## ~~desired precision~~
+## *proportions exposed/unexposed*
+
+---
+## You need:
+
+## ~~desired precision~~
+## ~~proportions exposed/unexposed~~
+## *group ratio*
+
+---
+## You need:
+
+## ~~desired precision~~
+## ~~proportions exposed/unexposed~~
+## ~~group ratio~~
+## *coverage*
+
+---
+class: inverse
+
+# the precisely R package
+
+## `r emojifont::emoji("dart")` Calculate sample size for precision
+
+--
+
+<br><br><br><br>
+
+#### install from GitHub:
+#### `remotes::install_github("malcolmbarrett/precisely")`
+
+---
+
+# Estimating n for risk difference
+
+```{r, eval = FALSE}
+library(precisely)
+n_risk_difference(
+  
+  
+  
+  
+  
+)
+```
+---
+
+# Estimating n for risk difference
+
+```{r, eval = FALSE}
+library(precisely)
+n_risk_difference(
+  precision = .08, #<<
+  
+  
+  
+ 
+)
+```
+
+---
+
+# Estimating n for risk difference
+
+```{r, eval = FALSE}
+library(precisely)
+n_risk_difference(
+  precision = .08, 
+  exposed = .4, #<<
+  unexposed = .3, #<<
+  
+  
+)
+```
+
+---
+
+# Estimating n for risk difference
+
+```{r, eval = FALSE}
+library(precisely)
+n_risk_difference(
+  precision = .08, 
+  exposed = .4,
+  unexposed = .3,
+  group_ratio = 3, #<<
+  
+)
+```
+---
+
+# Estimating n for risk difference
+
+```{r, eval = FALSE}
+library(precisely)
+n_risk_difference(
+  precision = .08,
+  exposed = .4,
+  unexposed = .3,
+  group_ratio = 3,
+  ci = .90 #<<
+)
+```
+
+---
+
+# Estimating n for risk difference
+
+```{r, highlight.output = 4}
+library(precisely)
+n_risk_difference(
+  precision = .08,
+  exposed = .4,
+  unexposed = .3,
+  group_ratio = 3,
+  ci = .90 
+)
+```
+
+---
+
+# Estimating n for odds ratios
+
+```{r, eval = FALSE}
+precisely::n_odds_ratio(
+  precision = 2,
+  exposed_cases = .4, #<<
+  exposed_controls = .3, #<<
+  group_ratio = 4
+)
+```
+
+---
+
+# Estimating n for odds ratios
+
+```{r, highlight.output = 4}
+precisely::n_odds_ratio(
+  precision = 2,
+  exposed_cases = .4,
+  exposed_controls = .3,
+  group_ratio = 4
+)
+```
+
+---
+
+class: middle
+
+|  measure |  differences |  ratios |
+|--:|--:|--:|
+| risks |  `r emojifont::emoji("heavy_check_mark")` | `r emojifont::emoji("heavy_check_mark")` |
+| rates |  `r emojifont::emoji("heavy_check_mark")` | `r emojifont::emoji("heavy_check_mark")` |
+| odds  |  `r emojifont::emoji("heavy_multiplication_x")` | `r emojifont::emoji("heavy_check_mark")` |
+
+---
+
+# Estimating precision given sample size
+
+```{r, eval = FALSE}
+precision_odds_ratio(
+  n_cases = 500,
+  exposed_cases = .6,
+  exposed_controls = .4,
+  group_ratio = 2
+)
+```
+
+---
+
+# Estimating precision given sample size
+
+```{r, highlight.output = 4}
+precision_odds_ratio(
+  n_cases = 500,
+  exposed_cases = .6,
+  exposed_controls = .4,
+  group_ratio = 2
+)
+```
+
+---
+
+### Vignettes and more: [precisely.malco.io](https://precisely.malco.io)
+
+--
+
+```{r echo = FALSE, dpi = 320}
+lower_risk <- tibble(
+  precision = seq(from = .02, to = .20, by = .005),
+  exposed = .2,
+  unexposed = .1,
+  group_ratio = 1
+)
+
+higher_risk <- tibble(
+  precision = seq(from = .02, to = .20, by = .005),
+  exposed = .4,
+  unexposed = .3,
+  group_ratio = 1
+)
+
+
+risk_difference_data <- bind_rows(lower_risk, higher_risk) %>% 
+  pmap_dfr(n_risk_difference)
+
+risk_difference_data %>% 
+  ggplot(aes(n_total, precision, col = factor(unexposed))) +
+    geom_line(size = 1.1) + 
+    xlim(c(0, 9000)) +
+    ggrepel::geom_text_repel( col = "grey30",
+      data = function(x) filter(x, near(n_total, 2500, 100)), 
+      aes(label = paste("Risk in Unexposed:", unexposed)), 
+      size = 4, segment.size = .5,
+      nudge_x = c(-900, 1100),
+      nudge_y = c(-.015, .03),
+     ) +
+    labs(
+      x = "Study Size", 
+      y = "Confidence Interval Width", 
+      color = "Risk in\nUnexposed"
+     ) +
+    theme_precisely() + 
+    theme(legend.position = "none",
+          plot.title = element_text(size = 16),
+          plot.subtitle = element_text(size = 12, color = "grey60")) +
+    scale_color_manual(values = c("#E69F00", "#56B4E9"))
+```
+
+---
+
+### [malcolmbarrett.shinyapps.io/precisely/](https://malcolmbarrett.shinyapps.io/precisely/)
+
+--
+
+![](shiny.gif)
+
+---
+
+# What's the baggage?
+
+---
+
+# ~~What's the baggage?~~
+## *precision == probability of estimate being true?*
+
+---
+
+background-image: url(morey.png)
+background-size: cover
+
+---
+
+# ~~What's the baggage?~~
+## ~~precision == probability of estimate being true?~~
+## *The ghost of statistical testing shall always haunt us*
+
+---
+
+class: inverse, middle
+background-image: url(significant.jpg)
+background-size: 65%
+
+---
+
+class: inverse, middle
+background-image: url(hidden.png)
+background-size: 75%
+
+---
+
+class: inverse, takeaways
+
+## **precisely lets you estimate sample size based on precision instead of significance**
+
+---
+
+class: inverse, takeaways
+
+## ~~precisely lets you estimate sample size based on precision instead of significance~~
+## **calculate n for common measures, like risk difference and risk ratio**
+
+---
+
+class: inverse, takeaways
+
+## ~~precisely lets you estimate sample size based on precision instead of significance~~
+## ~~calculate n for common measures, like risk difference and risk ratio~~
+## **Work in R or on the web**
+
+---
+
+class: inverse, center, middle
+
+![](https://media.giphy.com/media/3oz8xIsloV7zOmt81G/giphy.gif)
+#### `r fontawesome::fa("link",  fill = "#EDEEEF")` [precisely.malco.io](https://precisely.malco.io)
+#### `r fontawesome::fa("github",  fill = "#EDEEEF")` [malcolmbarrett](https://github.com/malcolmbarrett/)
+#### `r fontawesome::fa("twitter", fill = "#EDEEEF")` [@malco_barrett](https://twitter.com/malco_barrett)
+
+
+
+Slides: <a href='https://malco.io/slides/precisely'>malco.io/slides/precisely</a>
+
+.small[slides created via the R package [xaringan](https://github.com/yihui/xaringan).]
+
+---
+
+class: inverse
+
+# Appendix
+
+---
+
+background-image: url(precformula.png)
+background-size: 100%
